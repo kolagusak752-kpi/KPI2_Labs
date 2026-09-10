@@ -9,16 +9,25 @@ Workout ||--o{ Workout_Item : ""
 
 Exercise ||--o{ Workout_Item : ""
 
+Trainer o|--o{ Program : ""
+
+Trainer o|--{ Program_Item : ""
+
 Program {
     uuid id PK
     string name
+    uuid trainer_id FK
 }
 
 Athlete {
     uuid id PK
     string name
     uuid current_program_id FK
+}
 
+Trainer {
+    uuid id PK
+    string name
 }
 
 Workout {
@@ -30,7 +39,9 @@ Program_Item {
     uuid id PK
     uuid program_id FK
     uuid workout_id FK
+    uuid trainer_id FK
     int workout_order
+    
 }
 Exercise {
     uuid id PK
@@ -41,6 +52,7 @@ Workout_Item {
     uuid id PK
     uuid workout_id FK
     uuid exercise_id FK
-    int reps
+    int max_reps
+    int min_reps
     int sets
 }
