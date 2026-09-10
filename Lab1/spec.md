@@ -1,36 +1,36 @@
 Сутності:
 1) Athlete:
-    uuid id PK
-    string name 
-    uuid current_program_id FK
+    uuid id PK - унікальний ідентифікатор
+    string name - ім'я спротсмена
+    uuid current_program_id FK - ідентифікатор поточної програми
 
 2) Program:
-    uuid id PK
-    string name 
-    
+    uuid id PK - унікальний ідентифікатор
+    string name - назва програми
+
 3) Workout:
-    uuid id PK
-    string name
-    uuid program_id
+    uuid id PK - унікальний ідентифікатор
+    string name - назва тренування(на яку групу м'язів)
+    uuid program_id - ідентифікатор програми
 
 4) Exercise:
-    uuid id PK
-    string name
-    string description
+    uuid id PK - унікальний ідентифікатор
+    string name - назва вправи
+    string description - опис вправи(робити у положенні сидячи на настопному тренажері тощо)
 
 5) Workout_Item:
-    uuid id PK
-    uuid exercise_id FK
-    uuid workout_id FK
-    int exercise_order 
-    int reps
-    int sets
+    uuid id PK - унікальний ідентифікатор
+    uuid exercise_id FK - ідентифікатор вправи
+    uuid workout_id FK - ідентифікатор тренування
+    int exercise_order - порядковий номер вправи
+    int reps - кількість повторів
+    int sets - кількість підходів
 
 6) Program_Item:
-    uuid id PK
-    uuid program_id FK
-    uuid workout_id FK
-    int workout_order
+    uuid id PK - унікальний ідентифікатор
+    uuid program_id FK - ідентифікатор програми
+    uuid workout_id FK - ідентифікатор тренування
+    int workout_order - порядковий номер тренування
 
 Зв'язки:
     Кожен відвідувач може мати лише одну програму тренувань у конкретний момент часу , бо програма орієнтована на одну активність , а саме тренажерний зал, одну програму може використовувати декілька відвідувачів
