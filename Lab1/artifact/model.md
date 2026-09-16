@@ -11,7 +11,13 @@ Exercise ||--o{ Workout_Item : ""
 
 Trainer o|--o{ Program : ""
 
-Trainer o|--{ Program_Item : ""
+Trainer o|--o{ Program_Item : ""
+
+Subscription o{--|| Tariff : ""
+
+Athlete ||--o| Subscription : ""
+
+
 
 Program {
     uuid id PK
@@ -55,4 +61,11 @@ Workout_Item {
     int max_reps
     int min_reps
     int sets
+}
+Subscription {
+    uuid id PK
+    uuid tariff_id FK
+    Date start_date
+    bool isPaid
+    
 }
