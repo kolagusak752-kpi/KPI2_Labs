@@ -52,11 +52,10 @@
 
 10) User:
     uuid id PK - унікальний ідентифікатор
+    uuid id FK
     string email NULL - пошта користувача
     string phone_number - номер телефона
     string hashed_password - пароль
-    bool isTrainer - чи тренер
-    bool isAthlete - чи атлет
 
 11) Workout_Session:
     uuid id PK - унікальний ідентифікатор
@@ -71,12 +70,20 @@
     uuid workout_session_id FK - ідентифікатор сесії тренування
     uuid exercise_id FK - ідентифікатор вправи
     
-13) Workout_Session_Set
+13) Workout_Session_Set:
     uuid id PK - унікальний ідентифікатор
     uuid workout_session_exercise_id FK - ідентифікатор вправи конкретного тренування
     int order - порядковий номер підходу
     float weight - вага
     int reps - кількість повторів
+
+14) User_Roles:
+    uuid user_id PK - ідентифікатор юзера
+    int role_id FK - ідентифікатор ролі
+
+15) Role:
+    int id PK auto_increment - унікальний ідентифікатор
+    string name - назва ролі
 
 
 
@@ -96,5 +103,7 @@
     Сесія тренування може містити тільки одне тренування на виконання, одно виконувача та тренера(якщо тренування з ним)
 
     Сесія тренування містить усі вправи які були виконані від 0 до багатьох, усі виконані на тренуванні вправи містять підходи від 0 до багатьох
+
+    Кожен користувач може мати багато ролей, кожна роль може використовуватись багатьма користувачами
 
 

@@ -15,13 +15,13 @@ erDiagram
     Workout_Session ||--o{ Workout_Session_Exercise : ""
     Exercise ||--o{ Workout_Session_Exercise : ""
     Workout_Session_Exercise ||--o{ Workout_Session_Set : ""
+    User ||--|{ Role : ""
 
     Athlete {
-        uuid user_id PK,FK
-        string name
-        uuid current_program_id FK
-    }
-
+    uuid user_id PK,FK
+    string name
+    uuid current_program_id FK
+}
     Program {
         uuid id PK
         string name
@@ -81,8 +81,6 @@ erDiagram
         string email
         string phone_number
         string hashed_password
-        bool isTrainer
-        bool isAthlete
     }
 
     Workout_Session {
@@ -106,4 +104,9 @@ erDiagram
         int order
         float weight
         int reps
+    }
+
+    Role{
+        int id PK auto_incremental
+        string name
     }
