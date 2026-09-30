@@ -15,7 +15,7 @@ erDiagram
     Workout_Session ||--o{ Workout_Session_Exercise : ""
     Exercise ||--o{ Workout_Session_Exercise : ""
     Workout_Session_Exercise ||--o{ Workout_Session_Set : ""
-    User ||--|{ Role : ""
+    User o{--o{ Role : ""
 
     Athlete {
     uuid user_id PK,FK

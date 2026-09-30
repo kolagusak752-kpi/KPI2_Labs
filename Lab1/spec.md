@@ -1,3 +1,7 @@
+Статуси:
+subscription_status: "active", "ended"
+session_status: "active", "ended", "incomplete"
+program_status: "draft", "active", "archieved", blocked"
 Сутності:
 1) Athlete:
     uuid user_id FK PK - ідентифікатор юзера
@@ -8,6 +12,9 @@
     uuid id PK - унікальний ідентифікатор
     string name - назва програми
     uuid trainer_id NULL FK - ідентифікатор тренера(у разі якщо програма не є загальною, а написана тренером)
+    uuid athlete_id NULL FK - ідентифікатор атлета(у разі якщо програма не є загальною, а написана атлетом)
+    bool isPublic default false
+    program_status status default "draft"
 
 3) Workout:
     uuid id PK - унікальний ідентифікатор
@@ -49,6 +56,8 @@
     uuid user_id FK - ідентифікатор людини офрмила підписку
     Date start_date - дата початку дії програми
     bool isPaid  - чи оплачено
+    Date payment_deadline NULL - дедлайн по оплаті
+    subscription_status status default "active" - статус підписки
 
 10) User:
     uuid id PK - унікальний ідентифікатор
@@ -64,6 +73,7 @@
     int price - ціна тренування(у разі якщо тренування з тренером)
     bool isPaid NULL - чи оплачено(у разі якщо з тренером)
     timestamp date - коли відбулося тренування
+    session_status status default "active"
 
 12) Workout_Session_Exercise:
     uuid id PK - унікальний ідентифікатор
@@ -78,8 +88,8 @@
     int reps - кількість повторів
 
 14) User_Roles:
-    uuid user_id PK - ідентифікатор юзера
-    int role_id FK - ідентифікатор ролі
+    uuid user_id FK PK - ідентифікатор юзера
+    int role_id FK PK - ідентифікатор ролі
 
 15) Role:
     int id PK auto_increment - унікальний ідентифікатор
