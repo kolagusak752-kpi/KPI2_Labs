@@ -1,5 +1,5 @@
 Статуси:
-subscription_status: "active", "ended"
+subscription_status: "pending","active", "expired","grace"
 session_status: "active", "ended", "incomplete"
 program_status: "draft", "active", "archieved", blocked"
 Сутності:
@@ -11,8 +11,7 @@ program_status: "draft", "active", "archieved", blocked"
 2) Program:
     uuid id PK - унікальний ідентифікатор
     string name - назва програми
-    uuid trainer_id NULL FK - ідентифікатор тренера(у разі якщо програма не є загальною, а написана тренером)
-    uuid athlete_id NULL FK - ідентифікатор атлета(у разі якщо програма не є загальною, а написана атлетом)
+    uuid user_id FK - ідентифікатор користувача що створив програму
     bool isPublic default false
     program_status status default "draft"
 
@@ -54,10 +53,11 @@ program_status: "draft", "active", "archieved", blocked"
     uuid id PK - унікальний ідентифікатор
     uuid tariff_id FK - ідентифікатор тарифу
     uuid user_id FK - ідентифікатор людини офрмила підписку
-    Date start_date - дата початку дії програми
+    Date start_date - дата початку дії підписки
+    Date end_date - дата закінчення дії підписки
     bool isPaid  - чи оплачено
     Date payment_deadline NULL - дедлайн по оплаті
-    subscription_status status default "active" - статус підписки
+    subscription_status status default "pending" - статус підписки
 
 10) User:
     uuid id PK - унікальний ідентифікатор
