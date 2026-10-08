@@ -2,7 +2,7 @@ flowchart LR
     User((Користувач))
     Athlete((Атлет))
     Trainer((Тренер))
-    PaymentSystem((Платіжна система))
+  
 
     Athlete --> User
     Trainer --> User
@@ -41,7 +41,6 @@ flowchart LR
     Athlete --- UC_ChooseProg
 
     UC_Pay --- UC_Transaction
-    PaymentSystem --- UC_Transaction
 
     UC_SaveInc -.->|"<< extend >>"| UC_Workout
     UC_PublishProg -.->|"<< extend >>"| UC_CreateProg
