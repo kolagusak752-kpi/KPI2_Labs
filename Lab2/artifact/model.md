@@ -1,47 +1,53 @@
-flowchart LR
-    User((Користувач))
-    Athlete((Атлет))
-    Trainer((Тренер))
-  
+@startuml
+left to right direction
+skinparam packageStyle rectangle
 
-    Athlete --> User
-    Trainer --> User
+actor "Користувач" as User
+actor "Атлет" as Athlete
+actor "Тренер" as Trainer
 
-    UC_Role([Отримати роль])
-    UC_Pay([Оплатити підписку])
-    UC_CreateProg([Створити тренувальну програму])
-    UC_DeleteProg([Видалити програму])
-    UC_ChooseProg([Обрати програму])
+Athlete -u-|> User
+Trainer -u-|> User
+
+package "Тренувальний застосунок" {
+    usecase "Отримати роль" as UC_Role
+    usecase "Оплатити підписку" as UC_Pay
+    usecase "Створити тренувальну програму" as UC_CreateProg
+    usecase "Видалити програму" as UC_DeleteProg
+    usecase "Обрати програму" as UC_ChooseProg
     
-    UC_PublishProg([Опублікувати програму])
-    UC_ArchiveProg([Архівувати програму])
+    usecase "Опублікувати програму" as UC_PublishProg
+    usecase "Архівувати програму" as UC_ArchiveProg
     
-    UC_Workout([Провести тренування])
-    UC_ViewProg([Переглядати програму])
-    UC_History([Переглядати історію тренувань])
-    UC_Progress([Відслідковувати прогрес])
-    UC_FindTrainer([Знайти тренера])
+    usecase "Провести тренування" as UC_Workout
+    usecase "Переглядати програму" as UC_ViewProg
+    usecase "Переглядати історію тренувань" as UC_History
+    usecase "Відслідковувати прогрес" as UC_Progress
+    usecase "Знайти тренера" as UC_FindTrainer
     
-    UC_SaveInc([Зберегти незавершене тренування])
-    
-    UC_Transaction([Обробка транзакції])
+    usecase "Зберегти незавершене\nтренування" as UC_SaveInc
+    usecase "Обробка транзакції" as UC_Transaction
+}
 
-    User --- UC_Role
-    User --- UC_Pay
-    User --- UC_CreateProg
-    User --- UC_DeleteProg
 
-    Trainer --- UC_PublishProg
+User -- UC_Role
+User -- UC_Pay
+User -- UC_CreateProg
+User -- UC_DeleteProg
 
-    Athlete --- UC_Workout
-    Athlete --- UC_ViewProg
-    Athlete --- UC_History
-    Athlete --- UC_Progress
-    Athlete --- UC_FindTrainer
-    Athlete --- UC_ChooseProg
+Trainer -- UC_PublishProg
 
-    UC_Pay --- UC_Transaction
+Athlete -- UC_ChooseProg
+Athlete -- UC_Workout
+Athlete -- UC_ViewProg
+Athlete -- UC_History
+Athlete -- UC_Progress
+Athlete -- UC_FindTrainer
 
-    UC_SaveInc -.->|"<< extend >>"| UC_Workout
-    UC_PublishProg -.->|"<< extend >>"| UC_CreateProg
-    UC_ArchiveProg -.->|"<< extend >>"| UC_DeleteProg
+UC_Pay -- UC_Transaction
+
+UC_SaveInc .> UC_Workout : <<extend>>
+UC_PublishProg .> UC_CreateProg : <<extend>>
+UC_ArchiveProg .> UC_DeleteProg : <<extend>>
+
+@enduml
