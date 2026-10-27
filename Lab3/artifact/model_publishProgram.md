@@ -1,5 +1,5 @@
 sequenceDiagram
-    actor User as Користувач
+    actor User 
     participant Client as Frontend
     participant API as ProgramController
     participant Service as ProgramService
@@ -22,7 +22,7 @@ sequenceDiagram
   
     alt userData.role.includes("Trainer") 
 
-        Service->>DB: update(programId, 'Public')
+        Service->>DB: update(programId, "Public")
         activate DB
         DB-->>Service: success
         deactivate DB
