@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fitness Platform — Діаграма компонентів (UML 2)</title>
+  <style>
+    /* ============================================================
+       Full-Viewport Clean Academic Canvas (Diagram Only)
+       ============================================================ */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      background: #ffffff;
+      color: #0f172a;
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    #viewport {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: #ffffff;
+      cursor: grab;
+      user-select: none;
+      touch-action: none;
+    }
+
+    #viewport.dragging {
+      cursor: grabbing;
+    }
+
+    #canvas-stage {
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform-origin: 0 0;
+      will-change: transform;
+    }
+
+    #diagram-svg {
+      display: block;
+      overflow: visible;
+    }
+
+    /* ============================================================
+       Interactive Hover, Pin & Dimming Transitions
+       ============================================================ */
+    .uml-node {
+      cursor: pointer;
+      transition: opacity 0.16s ease;
+    }
+
+    .uml-node .node-box,
+    .uml-node .db-shape,
+    .uml-node .port-rect {
+      transition: stroke 0.16s ease, stroke-width 0.16s ease, fill 0.16s ease, filter 0.16s ease;
+    }
+
+    .uml-node:hover .node-box,
+    .uml-node.is-focused .node-box,
+    .uml-node:hover .db-shape,
+    .uml-node.is-focused .db-shape {
+      stroke: #2563eb;
+      stroke-width: 2;
+      filter: drop-shadow(0 2px 6px rgba(37, 99, 235, 0.16));
+    }
+
+    .uml-node:hover .port-rect,
+    .uml-node.is-focused .port-rect {
+      stroke: #2563eb;
+      fill: #dbeafe;
+      stroke-width: 2;
+    }
+
+    .uml-node.is-pinned .node-box,
+    .uml-node.is-pinned .db-shape,
+    .uml-node.is-pinned .port-rect {
+      stroke: #2563eb;
+      stroke-width: 2.3;
+    }
+
+    .uml-node.is-neighbor .node-box,
+    .uml-node.is-neighbor .db-shape {
+      stroke: #3b82f6;
+      stroke-width: 1.75;
+    }
+
+    .uml-node.is-neighbor .port-rect {
+      stroke: #3b82f6;
+      fill: #eff6ff;
+    }
+
+    .uml-edge,
+    .uml-assembly,
+    .asm-branch {
+      transition: opacity 0.16s ease;
+      pointer-events: none;
+    }
+
+    .uml-edge path,
+    .uml-assembly line,
+    .uml-assembly path,
+    .uml-assembly circle,
+    .asm-branch path {
+      transition: stroke 0.16s ease, stroke-width 0.16s ease;
+    }
+
+    .is-dimmed {
+      opacity: 0.16 !important;
+    }
+
+    /* Incoming connections: Blue (#2563eb) */
+    .edge-incoming path,
+    .branch-incoming path {
+      stroke: #2563eb !important;
+      stroke-width: 2.15 !important;
+    }
+
+    .assembly-incoming line,
+    .assembly-incoming path,
+    .assembly-incoming circle {
+      stroke: #2563eb !important;
+      stroke-width: 2.05 !important;
+    }
+
+    /* Outgoing connections: Orange (#ea580c) */
+    .edge-outgoing path,
+    .branch-outgoing path {
+      stroke: #ea580c !important;
+      stroke-width: 2.15 !important;
+    }
+
+    .assembly-outgoing line,
+    .assembly-outgoing path,
+    .assembly-outgoing circle {
+      stroke: #ea580c !important;
+      stroke-width: 2.05 !important;
+    }
+  </style>
+</head>
+<body>
+  <main id="viewport" aria-label="Fitness Platform UML 2 Component Diagram">
+    <div id="canvas-stage">
+      <svg id="diagram-svg" viewBox="0 0 2240 1180" width="2240" height="1180" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <!-- Open V-arrowheads for solid port delegations / associations and dashed dependencies -->
+          <marker id="arrow-v" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse">
+            <path d="M 1.5 1.5 L 8.5 5 L 1.5 8.5" fill="none" stroke="#334155" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round" />
+          </marker>
+          <marker id="arrow-v-blue" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse">
+            <path d="M 1.5 1.5 L 8.5 5 L 1.5 8.5" fill="none" stroke="#2563eb" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" />
+          </marker>
+          <marker id="arrow-v-orange" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse">
+            <path d="M 1.5 1.5 L 8.5 5 L 1.5 8.5" fill="none" stroke="#ea580c" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" />
+          </marker>
+
+          <!-- Standard UML 2 Component Icon (top-right corner of component boxes) -->
+          <g id="uml-component-icon">
+            <rect x="4" y="0" width="12.5" height="15.5" rx="0.8" fill="#ffffff" stroke="#64748b" stroke-width="1.15" />
+            <rect x="0" y="2.8" width="6.8" height="3.4" fill="#ffffff" stroke="#64748b" stroke-width="1.05" />
+            <rect x="0" y="9.2" width="6.8" height="3.4" fill="#ffffff" stroke="#64748b" stroke-width="1.05" />
+          </g>
+        </defs>
+
+        <!-- ==================== STATIC STRUCTURAL BOUNDARIES & PACKAGES ==================== -->
+        <g id="layer-containers">
+          <!-- Outer System Boundary: Fitness Platform -->
+          <rect x="254" y="122" width="1720" height="1036" rx="3" fill="#ffffff" stroke="#1e293b" stroke-width="1.6" />
+          <text x="270" y="144" font-size="14.5" font-weight="700" fill="#0f172a">Fitness Platform</text>
+
+          <!-- Package: Client UI (soft blue #ebf5ff, border #93c5fd) -->
+          <rect x="330" y="158" width="1568" height="110" rx="3" fill="#ebf5ff" stroke="#93c5fd" stroke-width="1.35" />
+          <text x="346" y="177" font-size="13" font-weight="700" fill="#1e40af">Frontend</text>
+
+          <!-- Main Process Component: Fitness Backend (UML icon top-right, no subtitle) -->
+          <rect x="310" y="352" width="1608" height="640" rx="3" fill="#ffffff" stroke="#334155" stroke-width="1.5" />
+          <text x="328" y="374" font-size="14" font-weight="700" fill="#0f172a">Fitness Backend</text>
+          <use href="#uml-component-icon" x="1890" y="361" />
+
+          <!-- Package: Controllers (soft green #edf7ed, border #86efac) -->
+          <rect x="330" y="388" width="1568" height="172" rx="3" fill="#edf7ed" stroke="#86efac" stroke-width="1.35" />
+          <text x="346" y="407" font-size="13" font-weight="700" fill="#166534">Controllers</text>
+
+          <!-- Package: Services (soft yellow #fefce8, border #fde047) -->
+          <rect x="330" y="612" width="1568" height="160" rx="3" fill="#fefce8" stroke="#fde047" stroke-width="1.35" />
+          <text x="346" y="631" font-size="13" font-weight="700" fill="#854d0e">Services</text>
+
+          <!-- Package: Repositories (soft purple #f5f3ff, border #c4b5fd) -->
+          <rect x="330" y="856" width="1568" height="98" rx="3" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.35" />
+          <text x="346" y="875" font-size="13" font-weight="700" fill="#6b21a8">Repositories</text>
+        </g>
+
+        <!-- ==================== DYNAMIC UML LAYERS ==================== -->
+        <g id="layer-edges"></g>
+        <g id="layer-assemblies"></g>
+        <g id="layer-nodes"></g>
+        <g id="layer-ports"></g>
+      </svg>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      'use strict';
+
+      const SVG_NS = 'http://www.w3.org/2000/svg';
+      const DIAGRAM_W = 2240;
+      const DIAGRAM_H = 1180;
+
+      /* ============================================================
+         1. EXACT UML 2 MODEL NODES
+         ============================================================ */
+      const NODES = {
+        /* Top Actor (outside Fitness Platform) */
+        User: {
+          id: 'User', kind: 'actor',
+          lines: ['Користувач', '(Атлет / Тренер)'],
+          cx: 1114, y: 10
+        },
+
+        /* Client UI — 7 separate pages in one horizontal row */
+        CatalogPage: {
+          id: 'CatalogPage', kind: 'component',
+          lines: ['Catalog Page'],
+          x: 365, y: 190, w: 180, h: 48
+        },
+        ProgramBuilderPage: {
+          id: 'ProgramBuilderPage', kind: 'component',
+          lines: ['Program Builder Page'],
+          x: 563, y: 190, w: 232, h: 48
+        },
+        WorkoutSessionPage: {
+          id: 'WorkoutSessionPage', kind: 'component',
+          lines: ['Workout Session Page'],
+          x: 813, y: 190, w: 232, h: 48
+        },
+        ProgressPage: {
+          id: 'ProgressPage', kind: 'component',
+          lines: ['Progress Page'],
+          x: 1063, y: 190, w: 184, h: 48
+        },
+        HistoryPage: {
+          id: 'HistoryPage', kind: 'component',
+          lines: ['History Page'],
+          x: 1265, y: 190, w: 176, h: 48
+        },
+        ProfilePage: {
+          id: 'ProfilePage', kind: 'component',
+          lines: ['Profile Page'],
+          x: 1459, y: 190, w: 176, h: 48
+        },
+        SubscriptionPage: {
+          id: 'SubscriptionPage', kind: 'component',
+          lines: ['Subscription Page'],
+          x: 1653, y: 190, w: 210, h: 48
+        },
+
+        /* Controllers (Router + 8 components below) */
+        Router: {
+          id: 'Router', kind: 'component',
+          lines: ['Router'],
+          x: 1044, y: 404, w: 140, h: 42
+        },
+        AuthMiddleware: {
+          id: 'AuthMiddleware', kind: 'component',
+          lines: ['AuthMiddleware'],
+          x: 486, y: 490, w: 142, h: 56
+        },
+        AuthController: {
+          id: 'AuthController', kind: 'component',
+          lines: ['AuthController'],
+          x: 644, y: 490, w: 142, h: 56
+        },
+        ProgramController: {
+          id: 'ProgramController', kind: 'component',
+          lines: ['ProgramController'],
+          x: 802, y: 490, w: 162, h: 56
+        },
+        WorkoutSessionController: {
+          id: 'WorkoutSessionController', kind: 'component',
+          lines: ['WorkoutSession', 'Controller'],
+          x: 980, y: 490, w: 168, h: 56
+        },
+        AnalyticsController: {
+          id: 'AnalyticsController', kind: 'component',
+          lines: ['AnalyticsController'],
+          x: 1164, y: 490, w: 164, h: 56
+        },
+        SubscriptionController: {
+          id: 'SubscriptionController', kind: 'component',
+          lines: ['Subscription', 'Controller'],
+          x: 1344, y: 490, w: 156, h: 56
+        },
+        SubscriptionCronJob: {
+          id: 'SubscriptionCronJob', kind: 'component',
+          lines: ['SubscriptionCronJob', 'cron'],
+          hasSubtitle: true,
+          x: 1516, y: 490, w: 172, h: 56
+        },
+        PaymentWebhookController: {
+          id: 'PaymentWebhookController', kind: 'component',
+          lines: ['PaymentWebhook', 'Controller'],
+          x: 1704, y: 490, w: 178, h: 56
+        },
+
+        /* Services (6 components aligned beneath their controllers) */
+        NotificationService: {
+          id: 'NotificationService', kind: 'component',
+          lines: ['NotificationService'],
+          x: 346, y: 656, w: 168, h: 56
+        },
+        AuthService: {
+          id: 'AuthService', kind: 'component',
+          lines: ['AuthService'],
+          x: 532, y: 656, w: 254, h: 56
+        },
+        ProgramService: {
+          id: 'ProgramService', kind: 'component',
+          lines: ['ProgramService'],
+          x: 802, y: 656, w: 162, h: 56
+        },
+        WorkoutSessionService: {
+          id: 'WorkoutSessionService', kind: 'component',
+          lines: ['WorkoutSession', 'Service'],
+          x: 980, y: 656, w: 168, h: 56
+        },
+        AnalyticsService: {
+          id: 'AnalyticsService', kind: 'component',
+          lines: ['AnalyticsService'],
+          x: 1164, y: 656, w: 164, h: 56
+        },
+        SubscriptionService: {
+          id: 'SubscriptionService', kind: 'component',
+          lines: ['SubscriptionService'],
+          x: 1352, y: 656, w: 510, h: 56
+        },
+
+        /* Repositories (4 components, leaving clean right gutter for ProgramService -> Cache out) */
+        UserRepository: {
+          id: 'UserRepository', kind: 'component',
+          lines: ['UserRepository', 'User, Athlete, Trainer, Role'],
+          hasSubtitle: true,
+          x: 510, y: 884, w: 250, h: 56
+        },
+        ProgramRepository: {
+          id: 'ProgramRepository', kind: 'component',
+          lines: ['ProgramRepository', 'Program, Workout, Exercise'],
+          hasSubtitle: true,
+          x: 786, y: 884, w: 240, h: 56
+        },
+        WorkoutSessionRepository: {
+          id: 'WorkoutSessionRepository', kind: 'component',
+          lines: ['WorkoutSessionRepository', 'Session, Exercise, Set'],
+          hasSubtitle: true,
+          x: 1052, y: 884, w: 276, h: 56
+        },
+        SubscriptionRepository: {
+          id: 'SubscriptionRepository', kind: 'component',
+          lines: ['SubscriptionRepository', 'Subscription, Tariff'],
+          hasSubtitle: true,
+          x: 1354, y: 884, w: 246, h: 56
+        },
+
+        /* 6 Ports sitting directly on the Fitness Backend border */
+        pHttp: {
+          id: 'pHttp', kind: 'port',
+          label: 'HTTP in', cx: 1114, cy: 352, lx: 1128, ly: 344, anchor: 'start'
+        },
+        pPush: {
+          id: 'pPush', kind: 'port',
+          label: 'push out', cx: 310, cy: 684, lx: 300, ly: 670, anchor: 'end'
+        },
+        pWh: {
+          id: 'pWh', kind: 'port',
+          label: 'webhook in', cx: 1918, cy: 518, lx: 1926, ly: 504, anchor: 'start'
+        },
+        pPsp: {
+          id: 'pPsp', kind: 'port',
+          label: 'PSP out', cx: 1918, cy: 684, lx: 1926, ly: 670, anchor: 'start'
+        },
+        pSql: {
+          id: 'pSql', kind: 'port',
+          label: 'SQL out', cx: 1056, cy: 992, lx: 1070, ly: 1007, anchor: 'start'
+        },
+        pCache: {
+          id: 'pCache', kind: 'port',
+          label: 'Cache out', cx: 1744, cy: 992, lx: 1758, ly: 1007, anchor: 'start'
+        },
+
+        /* Databases (inside Fitness Platform, outside Fitness Backend) */
+        FitnessDB: {
+          id: 'FitnessDB', kind: 'database',
+          lines: ['Fitness DB', 'PostgreSQL'],
+          x: 536, y: 1072, w: 1040, h: 64
+        },
+        RedisCache: {
+          id: 'RedisCache', kind: 'database',
+          lines: ['Redis Cache', 'кеш каталогу'],
+          x: 1604, y: 1072, w: 280, h: 64
+        },
+
+        /* External Systems (strictly outside Fitness Platform) */
+        PushProvider: {
+          id: 'PushProvider', kind: 'external',
+          stereotype: '«external»',
+          lines: ['Push Provider'],
+          x: 18, y: 638, w: 152, h: 92
+        },
+        PaymentProcessor: {
+          id: 'PaymentProcessor', kind: 'external',
+          stereotype: '«external»',
+          lines: ['Payment', 'Processor'],
+          x: 2070, y: 478, w: 152, h: 248
+        }
+      };
+
+      /* ============================================================
+         2. EXACT ORTHOGONAL EDGES
+         ============================================================ */
+      const EDGES = [
+        /* Actor -> 7 Client UI Pages (clean orthogonal bus at y=111) */
+        { id: 'e-u-cat',  from: 'User', to: 'CatalogPage',        style: 'solid', d: 'M 1114 100 V 111 H 455 V 190' },
+        { id: 'e-u-pb',   from: 'User', to: 'ProgramBuilderPage', style: 'solid', d: 'M 1114 100 V 111 H 679 V 190' },
+        { id: 'e-u-ws',   from: 'User', to: 'WorkoutSessionPage', style: 'solid', d: 'M 1114 100 V 111 H 929 V 190' },
+        { id: 'e-u-prog', from: 'User', to: 'ProgressPage',       style: 'solid', d: 'M 1114 100 V 111 H 1155 V 190' },
+        { id: 'e-u-hist', from: 'User', to: 'HistoryPage',        style: 'solid', d: 'M 1114 100 V 111 H 1353 V 190' },
+        { id: 'e-u-prof', from: 'User', to: 'ProfilePage',        style: 'solid', d: 'M 1114 100 V 111 H 1547 V 190' },
+        { id: 'e-u-sub',  from: 'User', to: 'SubscriptionPage',   style: 'solid', d: 'M 1114 100 V 111 H 1758 V 190' },
+
+        /* Incoming Port Delegations (solid) */
+        { id: 'e-del-http', from: 'pHttp', to: 'Router',                   style: 'solid', d: 'M 1114 358 V 404' },
+        { id: 'e-del-wh',   from: 'pWh',   to: 'PaymentWebhookController', style: 'solid', d: 'M 1912 518 H 1882' },
+
+        /* Router -> 6 Routed Controllers (dashed, distribution bus at y=468; SubscriptionCronJob has NO incoming arrow) */
+        { id: 'e-r-mw',     from: 'Router', to: 'AuthMiddleware',           style: 'dashed', d: 'M 1114 446 V 468 H 557 V 490' },
+        { id: 'e-r-auth',   from: 'Router', to: 'AuthController',           style: 'dashed', d: 'M 1114 446 V 468 H 715 V 490' },
+        { id: 'e-r-prog',   from: 'Router', to: 'ProgramController',        style: 'dashed', d: 'M 1114 446 V 468 H 883 V 490' },
+        { id: 'e-r-sess',   from: 'Router', to: 'WorkoutSessionController', style: 'dashed', d: 'M 1114 446 V 468 H 1064 V 490' },
+        { id: 'e-r-analyt', from: 'Router', to: 'AnalyticsController',      style: 'dashed', d: 'M 1114 446 V 468 H 1246 V 490' },
+        { id: 'e-r-sub',    from: 'Router', to: 'SubscriptionController',   style: 'dashed', d: 'M 1114 446 V 468 H 1422 V 490' },
+
+        /* Controllers -> Services (dashed, straight vertical drops) */
+        { id: 'e-c-mw',     from: 'AuthMiddleware',           to: 'AuthService',           style: 'dashed', d: 'M 557 546 V 656' },
+        { id: 'e-c-auth',   from: 'AuthController',           to: 'AuthService',           style: 'dashed', d: 'M 715 546 V 656' },
+        { id: 'e-c-prog',   from: 'ProgramController',        to: 'ProgramService',        style: 'dashed', d: 'M 883 546 V 656' },
+        { id: 'e-c-sess',   from: 'WorkoutSessionController', to: 'WorkoutSessionService', style: 'dashed', d: 'M 1064 546 V 656' },
+        { id: 'e-c-analyt', from: 'AnalyticsController',      to: 'AnalyticsService',      style: 'dashed', d: 'M 1246 546 V 656' },
+        { id: 'e-c-sub',    from: 'SubscriptionController',   to: 'SubscriptionService',   style: 'dashed', d: 'M 1422 546 V 656' },
+        { id: 'e-c-cron',   from: 'SubscriptionCronJob',      to: 'SubscriptionService',   style: 'dashed', d: 'M 1602 546 V 656' },
+        { id: 'e-c-wh',     from: 'PaymentWebhookController', to: 'SubscriptionService',   style: 'dashed', d: 'M 1793 546 V 656' },
+
+        /* Service-to-Service dependencies (dashed, clean channels at y=736 and y=756) */
+        { id: 'e-s-prog-notif', from: 'ProgramService',        to: 'NotificationService', style: 'dashed', d: 'M 834 712 V 736 H 456 V 712' },
+        { id: 'e-s-sess-sub',   from: 'WorkoutSessionService', to: 'SubscriptionService', style: 'dashed', d: 'M 1110 712 V 736 H 1384 V 712' },
+        { id: 'e-s-sub-notif',  from: 'SubscriptionService',   to: 'NotificationService', style: 'dashed', d: 'M 1420 712 V 756 H 404 V 712' },
+
+        /* Services -> Repositories (dashed, distinct tracks at y=796 and y=816) */
+        { id: 'e-sr-auth-u',   from: 'AuthService',           to: 'UserRepository',           style: 'dashed', d: 'M 635 712 V 884' },
+        { id: 'e-sr-prog-p',   from: 'ProgramService',        to: 'ProgramRepository',        style: 'dashed', d: 'M 890 712 V 884' },
+        { id: 'e-sr-prog-u',   from: 'ProgramService',        to: 'UserRepository',           style: 'dashed', d: 'M 864 712 V 796 H 682 V 884' },
+        { id: 'e-sr-sess-s',   from: 'WorkoutSessionService', to: 'WorkoutSessionRepository', style: 'dashed', d: 'M 1094 712 V 884' },
+        { id: 'e-sr-analyt-s', from: 'AnalyticsService',      to: 'WorkoutSessionRepository', style: 'dashed', d: 'M 1246 712 V 884' },
+        { id: 'e-sr-sub-sub',  from: 'SubscriptionService',   to: 'SubscriptionRepository',   style: 'dashed', d: 'M 1477 712 V 884' },
+        { id: 'e-sr-sub-u',    from: 'SubscriptionService',   to: 'UserRepository',           style: 'dashed', d: 'M 1446 712 V 816 H 724 V 884' },
+
+        /* Outgoing Port Delegations (solid) */
+        { id: 'e-del-push',       from: 'NotificationService', to: 'pPush',  style: 'solid', d: 'M 346 684 H 316' },
+        { id: 'e-del-psp',        from: 'SubscriptionService', to: 'pPsp',   style: 'solid', d: 'M 1862 684 H 1912' },
+        /* Dedicated right-hand corridor (y=836 -> x=1744) outside all Repository boxes */
+        { id: 'e-del-prog-cache', from: 'ProgramService',      to: 'pCache', style: 'solid', d: 'M 932 712 V 836 H 1744 V 986' },
+
+        /* Repositories -> SQL out (solid shared bus at y=972) */
+        { id: 'e-del-u-sql',   from: 'UserRepository',           to: 'pSql', style: 'solid', d: 'M 635 940 V 972 H 1056 V 986' },
+        { id: 'e-del-p-sql',   from: 'ProgramRepository',        to: 'pSql', style: 'solid', d: 'M 906 940 V 972 H 1056 V 986' },
+        { id: 'e-del-s-sql',   from: 'WorkoutSessionRepository', to: 'pSql', style: 'solid', d: 'M 1190 940 V 972 H 1056 V 986' },
+        { id: 'e-del-sub-sql', from: 'SubscriptionRepository',   to: 'pSql', style: 'solid', d: 'M 1477 940 V 972 H 1056 V 986' }
+      ];
+
+      /* ============================================================
+         3. EXACT UML 2 BALL-AND-SOCKET INTERFACES (6 Assemblies)
+         ============================================================ */
+      const ASSEMBLIES = [
+        {
+          id: 'asm-rest',
+          label: 'REST /api',
+          provider: 'pHttp',
+          consumers: [
+            { id: 'CatalogPage',        d: 'M 455 238 V 284 H 1114 V 303' },
+            { id: 'ProgramBuilderPage', d: 'M 679 238 V 284 H 1114 V 303' },
+            { id: 'WorkoutSessionPage', d: 'M 929 238 V 284 H 1114 V 303' },
+            { id: 'ProgressPage',       d: 'M 1155 238 V 284 H 1114 V 303' },
+            { id: 'HistoryPage',        d: 'M 1353 238 V 284 H 1114 V 303' },
+            { id: 'ProfilePage',        d: 'M 1547 238 V 284 H 1114 V 303' },
+            { id: 'SubscriptionPage',   d: 'M 1758 238 V 284 H 1114 V 303' }
+          ],
+          cx: 1114, cy: 314,
+          pX: 1114, pY: 346,
+          socketDir: 'top',
+          lx: 1134, ly: 318, anchor: 'start'
+        },
+        {
+          id: 'asm-sql',
+          label: 'SQL',
+          provider: 'FitnessDB',
+          consumer: 'pSql',
+          cx: 1056, cy: 1034,
+          pX: 1056, pY: 1072,
+          cX: 1056, cY: 998,
+          socketDir: 'top',
+          lx: 1074, ly: 1038, anchor: 'start'
+        },
+        {
+          id: 'asm-cache',
+          label: 'Cache API',
+          provider: 'RedisCache',
+          consumer: 'pCache',
+          cx: 1744, cy: 1034,
+          pX: 1744, pY: 1072,
+          cX: 1744, cY: 998,
+          socketDir: 'top',
+          lx: 1762, ly: 1038, anchor: 'start'
+        },
+        {
+          id: 'asm-push',
+          label: 'Push API',
+          provider: 'PushProvider',
+          consumer: 'pPush',
+          cx: 212, cy: 684,
+          pX: 170, pY: 684,
+          cX: 304, cY: 684,
+          socketDir: 'right',
+          lx: 212, ly: 663, anchor: 'middle'
+        },
+        {
+          id: 'asm-wh',
+          label: 'Webhook',
+          provider: 'pWh',
+          consumer: 'PaymentProcessor',
+          cx: 2020, cy: 518,
+          pX: 1924, pY: 518,
+          cX: 2070, cY: 518,
+          socketDir: 'right',
+          lx: 2020, ly: 544, anchor: 'middle'
+        },
+        {
+          id: 'asm-psp',
+          label: 'Payments API',
+          provider: 'PaymentProcessor',
+          consumer: 'pPsp',
+          cx: 2020, cy: 684,
+          pX: 2070, pY: 684,
+          cX: 1924, cY: 684,
+          socketDir: 'left',
+          lx: 2020, ly: 710, anchor: 'middle'
+        }
+      ];
+
+      /* ============================================================
+         4. SVG RENDERER
+         ============================================================ */
+      function el(tag, attrs = {}, parent = null) {
+        const node = document.createElementNS(SVG_NS, tag);
+        for (const [k, v] of Object.entries(attrs)) {
+          node.setAttribute(k, String(v));
+        }
+        if (parent) parent.appendChild(node);
+        return node;
+      }
+
+      const layerEdges = document.getElementById('layer-edges');
+      const layerAssemblies = document.getElementById('layer-assemblies');
+      const layerNodes = document.getElementById('layer-nodes');
+      const layerPorts = document.getElementById('layer-ports');
+
+      const nodeEls = new Map();
+      const edgeEls = new Map();
+      const asmEls = new Map();
+
+      function renderEdges() {
+        for (const edge of EDGES) {
+          const g = el('g', {
+            class: 'uml-edge',
+            'data-id': edge.id,
+            'data-from': edge.from,
+            'data-to': edge.to
+          }, layerEdges);
+
+          const isDashed = edge.style === 'dashed';
+          el('path', {
+            d: edge.d,
+            fill: 'none',
+            stroke: '#334155',
+            'stroke-width': isDashed ? '1.25' : '1.35',
+            'stroke-dasharray': isDashed ? '5,3.5' : 'none',
+            'stroke-linejoin': 'round',
+            'stroke-linecap': 'round',
+            'marker-end': 'url(#arrow-v)'
+          }, g);
+
+          edgeEls.set(edge.id, { el: g, data: edge });
+        }
+      }
+
+      function renderAssemblies() {
+        const R_LOLLIPOP = 7;
+        const R_SOCKET = 11;
+
+        for (const asm of ASSEMBLIES) {
+          const branchEls = new Map();
+
+          // Multi-consumer branches (e.g., 7 Client UI pages into shared REST /api bus)
+          if (Array.isArray(asm.consumers)) {
+            for (const c of asm.consumers) {
+              const bg = el('g', {
+                class: 'asm-branch',
+                'data-consumer': c.id,
+                'data-asm': asm.id
+              }, layerAssemblies);
+
+              el('path', {
+                d: c.d,
+                fill: 'none',
+                stroke: '#334155',
+                'stroke-width': '1.35',
+                'stroke-linejoin': 'round',
+                'stroke-linecap': 'round'
+              }, bg);
+
+              branchEls.set(c.id, bg);
+            }
+          }
+
+          const g = el('g', {
+            class: 'uml-assembly',
+            'data-id': asm.id,
+            'data-provider': asm.provider
+          }, layerAssemblies);
+
+          // 1. Provider stem up to lollipop perimeter
+          const dxP = asm.cx - asm.pX;
+          const dyP = asm.cy - asm.pY;
+          const lenP = Math.hypot(dxP, dyP) || 1;
+          const pEndX = asm.cx - (dxP / lenP) * R_LOLLIPOP;
+          const pEndY = asm.cy - (dyP / lenP) * R_LOLLIPOP;
+
+          el('line', {
+            x1: asm.pX, y1: asm.pY,
+            x2: pEndX, y2: pEndY,
+            stroke: '#334155',
+            'stroke-width': '1.35'
+          }, g);
+
+          // 2. Consumer stem (for single-consumer assemblies) & embracing socket arc
+          let cEndX = asm.cx;
+          let cEndY = asm.cy;
+          let arcD = '';
+
+          if (asm.socketDir === 'top') {
+            cEndX = asm.cx;
+            cEndY = asm.cy - R_SOCKET;
+            arcD = `M ${asm.cx - R_SOCKET} ${asm.cy} A ${R_SOCKET} ${R_SOCKET} 0 0 1 ${asm.cx + R_SOCKET} ${asm.cy}`;
+          } else if (asm.socketDir === 'bottom') {
+            cEndX = asm.cx;
+            cEndY = asm.cy + R_SOCKET;
+            arcD = `M ${asm.cx + R_SOCKET} ${asm.cy} A ${R_SOCKET} ${R_SOCKET} 0 0 1 ${asm.cx - R_SOCKET} ${asm.cy}`;
+          } else if (asm.socketDir === 'right') {
+            cEndX = asm.cx + R_SOCKET;
+            cEndY = asm.cy;
+            arcD = `M ${asm.cx} ${asm.cy - R_SOCKET} A ${R_SOCKET} ${R_SOCKET} 0 0 1 ${asm.cx} ${asm.cy + R_SOCKET}`;
+          } else if (asm.socketDir === 'left') {
+            cEndX = asm.cx - R_SOCKET;
+            cEndY = asm.cy;
+            arcD = `M ${asm.cx} ${asm.cy + R_SOCKET} A ${R_SOCKET} ${R_SOCKET} 0 0 1 ${asm.cx} ${asm.cy - R_SOCKET}`;
+          }
+
+          if (!Array.isArray(asm.consumers)) {
+            el('line', {
+              x1: asm.cX, y1: asm.cY,
+              x2: cEndX, y2: cEndY,
+              stroke: '#334155',
+              'stroke-width': '1.35'
+            }, g);
+          }
+
+          el('path', {
+            d: arcD,
+            fill: 'none',
+            stroke: '#334155',
+            'stroke-width': '1.4',
+            'stroke-linecap': 'round'
+          }, g);
+
+          // 3. Lollipop hollow circle
+          el('circle', {
+            cx: asm.cx,
+            cy: asm.cy,
+            r: R_LOLLIPOP,
+            fill: '#ffffff',
+            stroke: '#334155',
+            'stroke-width': '1.4'
+          }, g);
+
+          // 4. Interface label with crisp white halo
+          const lbl = el('text', {
+            x: asm.lx,
+            y: asm.ly,
+            'text-anchor': asm.anchor,
+            'font-size': '11.5',
+            'font-weight': '600',
+            fill: '#1e293b',
+            stroke: '#ffffff',
+            'stroke-width': '3.5',
+            'paint-order': 'stroke'
+          }, g);
+          lbl.textContent = asm.label;
+
+          asmEls.set(asm.id, { el: g, branches: branchEls, data: asm });
+        }
+      }
+
+      function renderNodes() {
+        for (const node of Object.values(NODES)) {
+          if (node.kind === 'port') renderPort(node);
+          else if (node.kind === 'actor') renderActor(node);
+          else if (node.kind === 'database') renderDatabase(node);
+          else renderBoxComponent(node);
+        }
+      }
+
+      function renderActor(node) {
+        const g = el('g', { class: 'uml-node', 'data-id': node.id }, layerNodes);
+
+        el('rect', {
+          x: node.cx - 68, y: node.y,
+          width: 136, height: 92,
+          rx: 4,
+          fill: 'transparent',
+          class: 'node-box'
+        }, g);
+
+        // Stick figure
+        el('circle', { cx: node.cx, cy: node.y + 13, r: 8.5, fill: '#ffffff', stroke: '#1e293b', 'stroke-width': '1.5' }, g);
+        el('line', { x1: node.cx, y1: node.y + 21.5, x2: node.cx, y2: node.y + 44, stroke: '#1e293b', 'stroke-width': '1.5' }, g);
+        el('line', { x1: node.cx - 13, y1: node.y + 29, x2: node.cx + 13, y2: node.y + 29, stroke: '#1e293b', 'stroke-width': '1.5', 'stroke-linecap': 'round' }, g);
+        el('line', { x1: node.cx, y1: node.y + 44, x2: node.cx - 10, y2: node.y + 59, stroke: '#1e293b', 'stroke-width': '1.5', 'stroke-linecap': 'round' }, g);
+        el('line', { x1: node.cx, y1: node.y + 44, x2: node.cx + 10, y2: node.y + 59, stroke: '#1e293b', 'stroke-width': '1.5', 'stroke-linecap': 'round' }, g);
+
+        const t1 = el('text', { x: node.cx, y: node.y + 74, 'text-anchor': 'middle', 'font-size': '12.5', 'font-weight': '700', fill: '#0f172a' }, g);
+        t1.textContent = node.lines[0];
+        const t2 = el('text', { x: node.cx, y: node.y + 88, 'text-anchor': 'middle', 'font-size': '11', fill: '#475569' }, g);
+        t2.textContent = node.lines[1];
+
+        nodeEls.set(node.id, { el: g, data: node });
+      }
+
+      function renderBoxComponent(node) {
+        const isExt = node.kind === 'external';
+        const g = el('g', { class: 'uml-node', 'data-id': node.id }, layerNodes);
+
+        el('rect', {
+          x: node.x, y: node.y,
+          width: node.w, height: node.h,
+          rx: 4,
+          fill: isExt ? '#f3f4f6' : '#ffffff',
+          stroke: isExt ? '#9ca3af' : '#64748b',
+          'stroke-width': '1.25',
+          class: 'node-box'
+        }, g);
+
+        // UML 2 component icon in top-right corner
+        el('use', {
+          href: '#uml-component-icon',
+          x: node.x + node.w - 22,
+          y: node.y + 6
+        }, g);
+
+        const textCenterX = isExt ? node.x + node.w / 2 : node.x + (node.w - 14) / 2;
+        const centerY = node.y + node.h / 2;
+
+        if (isExt) {
+          const items = [
+            { text: node.stereotype, size: 11, weight: '500', italic: true, color: '#475569' },
+            ...node.lines.map((line) => ({
+              text: line,
+              size: 12.5,
+              weight: '700',
+              italic: false,
+              color: '#0f172a'
+            }))
+          ];
+          const lineH = 16.5;
+          const startY = centerY - ((items.length - 1) * lineH) / 2 + 4;
+          items.forEach((item, idx) => {
+            const t = el('text', {
+              x: textCenterX,
+              y: startY + idx * lineH,
+              'text-anchor': 'middle',
+              'font-size': item.size,
+              'font-weight': item.weight,
+              'font-style': item.italic ? 'italic' : 'normal',
+              fill: item.color
+            }, g);
+            t.textContent = item.text;
+          });
+        } else {
+          const lineH = 15.5;
+          const startY = centerY - ((node.lines.length - 1) * lineH) / 2 + 4;
+          node.lines.forEach((line, idx) => {
+            const isSub = Boolean(node.hasSubtitle && idx === node.lines.length - 1);
+            const t = el('text', {
+              x: textCenterX,
+              y: startY + idx * lineH,
+              'text-anchor': 'middle',
+              'font-size': isSub ? '10.5' : '12',
+              'font-weight': isSub ? '500' : '600',
+              fill: isSub ? '#64748b' : '#0f172a'
+            }, g);
+            t.textContent = line;
+          });
+        }
+
+        nodeEls.set(node.id, { el: g, data: node });
+      }
+
+      function renderDatabase(node) {
+        const g = el('g', { class: 'uml-node', 'data-id': node.id }, layerNodes);
+        const { x, y, w, h } = node;
+        const rx = w / 2;
+        const ry = 9.5;
+        const bodyTop = y + ry;
+        const bodyBottom = y + h - ry;
+
+        // Cylinder body (soft peach/orange #fff7ed, border #fdba74)
+        const bodyD = `M ${x} ${bodyTop} L ${x} ${bodyBottom} A ${rx} ${ry} 0 0 0 ${x + w} ${bodyBottom} L ${x + w} ${bodyTop}`;
+        el('path', {
+          d: bodyD,
+          fill: '#fff7ed',
+          stroke: '#fdba74',
+          'stroke-width': '1.45',
+          class: 'db-shape'
+        }, g);
+
+        // Cylinder top ellipse
+        el('ellipse', {
+          cx: x + rx,
+          cy: bodyTop,
+          rx: rx,
+          ry: ry,
+          fill: '#ffedd5',
+          stroke: '#fdba74',
+          'stroke-width': '1.45',
+          class: 'db-shape'
+        }, g);
+
+        const t1 = el('text', {
+          x: x + rx,
+          y: y + h / 2 + 2,
+          'text-anchor': 'middle',
+          'font-size': '13',
+          'font-weight': '700',
+          fill: '#9a3412'
+        }, g);
+        t1.textContent = node.lines[0];
+
+        const t2 = el('text', {
+          x: x + rx,
+          y: y + h / 2 + 17,
+          'text-anchor': 'middle',
+          'font-size': '11',
+          'font-weight': '500',
+          fill: '#b45309'
+        }, g);
+        t2.textContent = node.lines[1];
+
+        nodeEls.set(node.id, { el: g, data: node });
+      }
+
+      function renderPort(node) {
+        const g = el('g', { class: 'uml-node', 'data-id': node.id }, layerPorts);
+
+        // Generous invisible hit area
+        el('rect', {
+          x: node.cx - 14,
+          y: node.cy - 14,
+          width: 28,
+          height: 28,
+          fill: 'transparent'
+        }, g);
+
+        // 12x12 white square sitting directly on the Fitness Backend border
+        el('rect', {
+          x: node.cx - 6,
+          y: node.cy - 6,
+          width: 12,
+          height: 12,
+          fill: '#ffffff',
+          stroke: '#1e293b',
+          'stroke-width': '1.6',
+          class: 'port-rect'
+        }, g);
+
+        const lbl = el('text', {
+          x: node.lx,
+          y: node.ly,
+          'text-anchor': node.anchor,
+          'font-size': '11.5',
+          'font-weight': '700',
+          fill: '#1e3a8a',
+          stroke: '#ffffff',
+          'stroke-width': '3.5',
+          'paint-order': 'stroke'
+        }, g);
+        lbl.textContent = node.label;
+
+        nodeEls.set(node.id, { el: g, data: node });
+      }
+
+      renderEdges();
+      renderAssemblies();
+      renderNodes();
+
+      /* ============================================================
+         5. HOVER & CLICK-TO-PIN HIGHLIGHTING
+         ============================================================ */
+      let pinnedNodeId = null;
+      let hoveredNodeId = null;
+
+      function clearHighlights() {
+        for (const { el: g } of nodeEls.values()) {
+          g.classList.remove('is-dimmed', 'is-focused', 'is-pinned', 'is-neighbor');
+        }
+        for (const { el: g } of edgeEls.values()) {
+          g.classList.remove('is-dimmed', 'edge-incoming', 'edge-outgoing');
+          g.querySelector('path').setAttribute('marker-end', 'url(#arrow-v)');
+        }
+        for (const { el: g, branches } of asmEls.values()) {
+          g.classList.remove('is-dimmed', 'assembly-incoming', 'assembly-outgoing');
+          for (const bg of branches.values()) {
+            bg.classList.remove('is-dimmed', 'branch-incoming', 'branch-outgoing');
+          }
+        }
+      }
+
+      function highlightNode(nodeId, isPinned) {
+        clearHighlights();
+        if (!nodeId || !NODES[nodeId]) return;
+
+        const neighbors = new Set([nodeId]);
+
+        for (const { el: g, data } of edgeEls.values()) {
+          const p = g.querySelector('path');
+          if (data.to === nodeId) {
+            g.classList.add('edge-incoming');
+            p.setAttribute('marker-end', 'url(#arrow-v-blue)');
+            neighbors.add(data.from);
+          } else if (data.from === nodeId) {
+            g.classList.add('edge-outgoing');
+            p.setAttribute('marker-end', 'url(#arrow-v-orange)');
+            neighbors.add(data.to);
+          } else {
+            g.classList.add('is-dimmed');
+          }
+        }
+
+        // Ball-and-socket direction: consumer calls provider (outgoing for consumer, incoming for provider)
+        for (const { el: g, branches, data } of asmEls.values()) {
+          if (Array.isArray(data.consumers)) {
+            const consumerIds = data.consumers.map((c) => c.id);
+            if (data.provider === nodeId) {
+              g.classList.add('assembly-incoming');
+              for (const [cid, bg] of branches.entries()) {
+                bg.classList.add('branch-incoming');
+                neighbors.add(cid);
+              }
+            } else if (consumerIds.includes(nodeId)) {
+              g.classList.add('assembly-outgoing');
+              neighbors.add(data.provider);
+              for (const [cid, bg] of branches.entries()) {
+                if (cid === nodeId) {
+                  bg.classList.add('branch-outgoing');
+                } else {
+                  bg.classList.add('is-dimmed');
+                }
+              }
+            } else {
+              g.classList.add('is-dimmed');
+              for (const bg of branches.values()) {
+                bg.classList.add('is-dimmed');
+              }
+            }
+          } else {
+            if (data.provider === nodeId) {
+              g.classList.add('assembly-incoming');
+              neighbors.add(data.consumer);
+            } else if (data.consumer === nodeId) {
+              g.classList.add('assembly-outgoing');
+              neighbors.add(data.provider);
+            } else {
+              g.classList.add('is-dimmed');
+            }
+          }
+        }
+
+        for (const [id, { el: g }] of nodeEls.entries()) {
+          if (id === nodeId) {
+            g.classList.add('is-focused');
+            if (isPinned) g.classList.add('is-pinned');
+          } else if (neighbors.has(id)) {
+            g.classList.add('is-neighbor');
+          } else {
+            g.classList.add('is-dimmed');
+          }
+        }
+      }
+
+      function refreshHighlight() {
+        if (hoveredNodeId) {
+          highlightNode(hoveredNodeId, pinnedNodeId === hoveredNodeId);
+        } else if (pinnedNodeId) {
+          highlightNode(pinnedNodeId, true);
+        } else {
+          clearHighlights();
+        }
+      }
+
+      for (const [id, { el: g }] of nodeEls.entries()) {
+        g.addEventListener('mouseenter', () => {
+          hoveredNodeId = id;
+          refreshHighlight();
+        });
+        g.addEventListener('mouseleave', () => {
+          if (hoveredNodeId === id) {
+            hoveredNodeId = null;
+            refreshHighlight();
+          }
+        });
+        g.addEventListener('click', (e) => {
+          e.stopPropagation();
+          pinnedNodeId = (pinnedNodeId === id) ? null : id;
+          hoveredNodeId = null;
+          refreshHighlight();
+        });
+      }
+
+      /* ============================================================
+         6. SMOOTH WHEEL ZOOM, DRAG-TO-PAN & DOUBLE-CLICK RESET
+         ============================================================ */
+      const viewport = document.getElementById('viewport');
+      const stage = document.getElementById('canvas-stage');
+
+      let scale = 1;
+      let tx = 0;
+      let ty = 0;
+      const MIN_SCALE = 0.25;
+      const MAX_SCALE = 2.6;
+
+      function applyTransform() {
+        stage.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
+      }
+
+      function fitToViewport() {
+        const rect = viewport.getBoundingClientRect();
+        const pad = 20;
+        const availW = Math.max(160, rect.width - pad * 2);
+        const availH = Math.max(160, rect.height - pad * 2);
+        scale = Math.max(MIN_SCALE, Math.min(availW / DIAGRAM_W, availH / DIAGRAM_H, 1.2));
+        tx = (rect.width - DIAGRAM_W * scale) / 2;
+        ty = (rect.height - DIAGRAM_H * scale) / 2;
+        applyTransform();
+      }
+
+      function zoomAt(nextScale, clientX, clientY) {
+        const rect = viewport.getBoundingClientRect();
+        const clamped = Math.min(MAX_SCALE, Math.max(MIN_SCALE, nextScale));
+        const px = clientX - rect.left;
+        const py = clientY - rect.top;
+        const worldX = (px - tx) / scale;
+        const worldY = (py - ty) / scale;
+        scale = clamped;
+        tx = px - worldX * scale;
+        ty = py - worldY * scale;
+        applyTransform();
+      }
+
+      // Smooth mouse wheel zoom toward pointer
+      viewport.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const factor = e.deltaY < 0 ? 1.1 : 1 / 1.1;
+        zoomAt(scale * factor, e.clientX, e.clientY);
+      }, { passive: false });
+
+      // Click-drag pan & background click to clear pin
+      let isDragging = false;
+      let moved = false;
+      let startX = 0;
+      let startY = 0;
+      let startTx = 0;
+      let startTy = 0;
+
+      viewport.addEventListener('mousedown', (e) => {
+        if (e.button !== 0) return;
+        isDragging = true;
+        moved = false;
+        startX = e.clientX;
+        startY = e.clientY;
+        startTx = tx;
+        startTy = ty;
+        viewport.classList.add('dragging');
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        if (Math.abs(dx) > 4 || Math.abs(dy) > 4) moved = true;
+        tx = startTx + dx;
+        ty = startTy + dy;
+        applyTransform();
+      });
+
+      window.addEventListener('mouseup', () => {
+        if (!isDragging) return;
+        isDragging = false;
+        viewport.classList.remove('dragging');
+      });
+
+      viewport.addEventListener('click', () => {
+        if (!moved && pinnedNodeId) {
+          pinnedNodeId = null;
+          hoveredNodeId = null;
+          refreshHighlight();
+        }
+      });
+
+      // Double-click to reset view
+      viewport.addEventListener('dblclick', (e) => {
+        e.preventDefault();
+        fitToViewport();
+      });
+
+      // Touch pan & pinch-zoom support
+      let touchMode = null;
+      let lastPinchDist = 0;
+
+      viewport.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 1) {
+          touchMode = 'pan';
+          startX = e.touches[0].clientX;
+          startY = e.touches[0].clientY;
+          startTx = tx;
+          startTy = ty;
+        } else if (e.touches.length === 2) {
+          touchMode = 'pinch';
+          const [t1, t2] = e.touches;
+          lastPinchDist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+        }
+      }, { passive: true });
+
+      viewport.addEventListener('touchmove', (e) => {
+        if (touchMode === 'pan' && e.touches.length === 1) {
+          e.preventDefault();
+          tx = startTx + (e.touches[0].clientX - startX);
+          ty = startTy + (e.touches[0].clientY - startY);
+          applyTransform();
+        } else if (touchMode === 'pinch' && e.touches.length === 2) {
+          e.preventDefault();
+          const [t1, t2] = e.touches;
+          const dist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+          const cx = (t1.clientX + t2.clientX) / 2;
+          const cy = (t1.clientY + t2.clientY) / 2;
+          if (lastPinchDist > 0) zoomAt(scale * (dist / lastPinchDist), cx, cy);
+          lastPinchDist = dist;
+        }
+      }, { passive: false });
+
+      viewport.addEventListener('touchend', () => {
+        touchMode = null;
+      });
+
+      window.addEventListener('resize', fitToViewport);
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && pinnedNodeId) {
+          pinnedNodeId = null;
+          hoveredNodeId = null;
+          refreshHighlight();
+        }
+      });
+
+      fitToViewport();
+    })();
+  </script>
+</body>
+</html>
