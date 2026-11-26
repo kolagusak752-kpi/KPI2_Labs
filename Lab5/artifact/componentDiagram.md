@@ -45,6 +45,7 @@ rectangle "Fitness Platform" {
       Router ..> SessCtrl
       Router ..> AnalytCtrl
       Router ..> SubCtrl
+      Router ..> PayWhCtrl
     }
 
     package "Services" {
@@ -67,9 +68,9 @@ rectangle "Fitness Platform" {
       component "SubscriptionRepository" as SubRepo
     }
 
-    ' Делегирование входных портов
+  
     pHttp --> Router
-    pWh --> PayWhCtrl
+    pWh --> Router
 
     ' Controllers -> Services
     AuthMw ..> AuthSvc

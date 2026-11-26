@@ -21,7 +21,7 @@
         - Router — приймає користувацькі запити з порту HTTP in, на захищені маршрути підключає AuthMiddleware і передає запит у потрібний контролер.
         - AuthMiddleware — перевіряє лише наявність і валідність токена авторизації.
         - AuthController, ProgramController, WorkoutSessionController, AnalyticsController, SubscriptionController — приймають HTTP-запити від клієнта і передають у відповідні сервіси.
-        - PaymentWebhookController — приймає асинхронні вебхуки від платіжної системи напряму через окремий порт webhook in в обхід Router і AuthMiddleware, перевіряє криптографічний підпис запиту і передає результат у SubscriptionService.
+        - PaymentWebhookController — приймає асинхронні вебхуки від платіжної системи напряму через окремий порт webhook in, перевіряє криптографічний підпис запиту і передає результат у SubscriptionService.
         - SubscriptionCronJob — фонова задача за розкладом, яка викликає SubscriptionService для переведення прострочених підписок у статуси grace та expired.
 
     3. Services:
